@@ -1,5 +1,6 @@
 certifi==2019.3.9
 chardet==3.0.4
+configparser==3.7.4
 gevent==1.4.0
 greenlet==0.4.15
 idna==2.8
