@@ -4,10 +4,7 @@
 import hashlib
 import base64
 import requests
-import urllib
 import time
-import json
-import binascii
 import M2Crypto
 from operator import itemgetter
 
@@ -182,16 +179,9 @@ ESvCszmEklxRqL6xAgMBAAE=
     base_url = "http://pub-api.qa.ccx123.com"
     #base_url = "http://127.0.0.1:10241"
     AcessToken = "maxiao"  
-    #__init__(self, api_url, acess_token, public_key, private_key, requests_params=None): 
-    print  conf.PUBLIC_KEY
-    print  conf.PRIVATE_KEY
-    if conf.PRIVATE_KEY == private_key :
-        print "=2=="
-    if conf.PUBLIC_KEY == public_key :
-        print "==1="
-
-    #req = RequestClient(conf.RESP_HTTP_API_URL, conf.ACCESS_TOCKEN, conf.PUBLIC_KEY, conf.PRIVATE_KEY)
-    req = RequestClient(conf.RESP_HTTP_API_URL, conf.ACCESS_TOCKEN, public_key, private_key)
+    #__init__(self, api_url, acess_token, public_key, private_key, requests_params=None):
+    req = RequestClient(conf.RESP_HTTP_API_URL, conf.ACCESS_TOCKEN, conf.PUBLIC_KEY, conf.PRIVATE_KEY)
+    #req = RequestClient(conf.RESP_HTTP_API_URL, conf.ACCESS_TOCKEN, public_key, private_key)
     #print req.get_accounts()
 
     #print req.put_limit_order("BGUSDT", "BUY", "0.00000001", "1")
