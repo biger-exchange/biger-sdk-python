@@ -6,6 +6,7 @@ import base64
 import requests
 import time
 import M2Crypto
+import json
 from operator import itemgetter
 
 from log import *
@@ -22,7 +23,8 @@ class RequestClient(object):
 
     def _init_session(self):
         session = requests.session()
-        session.headers.update({'Accept': 'application/json',
+        session.headers.update({'Content-Type': 'application/json',
+                                'Accept': 'application/json',
                                 'User-Agent': 'biger/python',
                                 'BIGER-ACCESS-TOKEN': self.ACESS_TOKEN})
         return session
@@ -32,9 +34,10 @@ class RequestClient(object):
 
     def _sign(self, data):
         try:
-            #print "data:" + data
+            print "data:" + data
             sign_key = M2Crypto.RSA.load_key_string(self.PRIVATE_KEY)
             sha256_str = hashlib.sha256(data.encode('utf-8'))
+            print "base64 sha256_str: " + base64.b64encode(sha256_str.digest())
             signature = sign_key.private_encrypt(sha256_str.digest(), M2Crypto.RSA.pkcs1_padding)
             return base64.b64encode(signature)
         except Exception as e:
@@ -44,6 +47,7 @@ class RequestClient(object):
     def _verify(self, data, signature):
         verify_key = M2Crypto.RSA.load_pub_key_bio(M2Crypto.BIO.MemoryBuffer(self.PUBLIC_KEY))
         plain_signature = verify_key.public_decrypt(base64.b64decode(signature), M2Crypto.RSA.pkcs1_padding)
+        print "base64 plain_signature: " + base64.b64encode(plain_signature)
         if plain_signature == hashlib.sha256(data.encode('utf-8')).digest():
             return 0
         return 1
@@ -133,14 +137,14 @@ class RequestClient(object):
     #限价单
     #exchange/orders/create
     def put_limit_order(self, symbol, side, price, amount):
-        params = {
+        body = {
             "symbol"    :  symbol.upper(),
             "side"      :  side.upper(),
             "price"     :  price,
             "orderQty"  :  amount,
             "orderType" :  "LIMIT"
         }
-        return self._post("exchange/orders/create", **params)
+        return self._post("exchange/orders/create", json.dumps(body))
 
     #撤销订单
     #exchange/orders/cancel/
@@ -165,6 +169,23 @@ xgj61LCJMk13kChBAkBwXwAxM5c0qPMbLs2mKDQbqb6KYgcFQZOjsj8u3T6zQvnX
 4jXF5U9sgNwyC/2IYVJvMAh9hXlFtEeGS3w2XL2M
 -----END RSA PRIVATE KEY-----'''
     
+    private_key_pkcs8 = '''-----BEGIN PRIVATE KEY-----
+MIICdAIBADANBgkqhkiG9w0BAQEFAASCAl4wggJaAgEAAoGAVQjK2WeM72Rt9JeH
+QPxGRqvv01uW3qxaLZIsmoynLGXOoqvOGRYukSC1oKZ+BTIOXHCkvfzBpZdEDgEd
+W/NFTO28fh7eA5uPBnF6demXwC7lJzzmybqafJXZK2N5h5Y4oPInzv+cELyA1oxv
+rlnfyQ+Yu4URK8KzOYSSXFGovrECAwEAAQKBgDoI3iiye4WGzWR5Zl37zxq8jdl6
+UOV4S7N+Z+KyzAWJFhX/m5GTigSShmM2Phvdpd+BIW5o6uDQ9Cl6qUbwKQMmeEYR
+7m3gY1BA4YMjZ+dDtRcCNBIW0hIlC70jw7PDFEev4HzW2sjLMuNr4BgasObf/VJI
+EDLn7b3ZfJolbzSBAkEAlE0+kJS2wAupxvLBSFkBTYaF0u/u1kk9NLFAuu3a8H+3
+DVc8LyFM7GW+DaU4GN6t/IvFxiE6lPoTeVtyirr2ZQJBAJLJhBZvB9Dt6ByrTjhT
+4mQdab1q/otILRHFmPnEupLnPDJVJe9AS7kNsA9qJbJ1/kTMS2JXChYjhsxJthIm
+jF0CQFKu2nILp/RczFSSpfarQRGzLcuUYCny/X/yT2+pC4dI/YsflvuD6npmo1bC
+Rgt/o6uJVkQH5LyIzPC9bpgwcw0CQFLRP6Uon9BRalRCkq9VJLY3oiEs7NDIuCT+
+x4Ckbl/T9zKut+h07kRKZLtNuFcoG33VhfLGCPrUsIkyTXeQKEECQHBfADEzlzSo
+8xsuzaYoNBupvopiBwVBk6OyPy7dPrNC+dfiNcXlT2yA3DIL/YhhUm8wCH2FeUW0
+R4ZLfDZcvYw=
+-----END PRIVATE KEY-----'''
+
     #公钥文件
     public_key = '''-----BEGIN PUBLIC KEY-----
 MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgFUIytlnjO9kbfSXh0D8Rkar79Nb
@@ -182,11 +203,16 @@ ESvCszmEklxRqL6xAgMBAAE=
     #__init__(self, api_url, acess_token, public_key, private_key, requests_params=None):
     req = RequestClient(conf.RESP_HTTP_API_URL, conf.ACCESS_TOCKEN, conf.PUBLIC_KEY, conf.PRIVATE_KEY)
     #req = RequestClient(conf.RESP_HTTP_API_URL, conf.ACCESS_TOCKEN, public_key, private_key)
-    #print req.get_accounts()
+    #req.get_accounts()
+    #enc_data = req._sign("GET123456789")
+    #print "singed data: " + enc_data
 
-    #print req.put_limit_order("BGUSDT", "BUY", "0.00000001", "1")
+    #print req._verify("GET123456789",enc_data)
+    #dec_data = 'HQMM4FK00zEX51K1ieww2MWZwc6MmRHa+u0LqqPE1GygID89PvCl5GTWxyMf0SqEMUyijJryGl2IflVjDqri621ioHbW0zB/ev0mUwRXG+8+d+TwSoc2xH34DNqclpmwUX+yRrruahPdhjTpt1614vBvIo3qqPADjknszvJbuM0='
+    #print req._verify("GET123456789",dec_data)
+    print req.put_limit_order("BGUSDT", "BUY", "0.000001", "1")
 
-    print req.query_current_all_orders("BGUSDT", "BUY")
+    #print req.query_current_all_orders("BGUSDT", "BUY")
     #print req.query_current_all_orders("BGUSDT", "SELL")
 
     #print req.query_order("43960eab-d040-4eca-a4cd-bb20473e9960")
