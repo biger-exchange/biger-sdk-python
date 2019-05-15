@@ -119,9 +119,9 @@ class RequestClient(object):
         return self._get("exchange/accounts/list/accounts")
 
     #查询指定单
-    #exchange/orders/get/43960eab-d040-4eca-a4cd-bb20473e9960
+    #exchange/orders/get/orderId/43960eab-d040-4eca-a4cd-bb20473e9960
     def query_order(self, orderid):
-        return self._get("exchange/orders/get/" + orderid)
+        return self._get("exchange/orders/get/orderId/" + orderid)
 
     #查询当前所有单
     #exchange/orders/current?symbol={ symbol }&side={ side }&offset={ offset=}&limit={ limit } 
@@ -210,13 +210,15 @@ ESvCszmEklxRqL6xAgMBAAE=
     #print req._verify("GET123456789",enc_data)
     #dec_data = 'HQMM4FK00zEX51K1ieww2MWZwc6MmRHa+u0LqqPE1GygID89PvCl5GTWxyMf0SqEMUyijJryGl2IflVjDqri621ioHbW0zB/ev0mUwRXG+8+d+TwSoc2xH34DNqclpmwUX+yRrruahPdhjTpt1614vBvIo3qqPADjknszvJbuM0='
     #print req._verify("GET123456789",dec_data)
-    print req.put_limit_order("BGUSDT", "BUY", "0.000001", "1")
-
+    put_data = req.put_limit_order("BGUSDT", "BUY", "0.000001", "1")
+    print put_data
+    orderid = put_data['data']['orderId']
+    print "orderid: " + orderid
     #print req.query_current_all_orders("BGUSDT", "BUY")
     #print req.query_current_all_orders("BGUSDT", "SELL")
 
-    #print req.query_order("43960eab-d040-4eca-a4cd-bb20473e9960")
+    #print req.query_order(orderid)
 
-    #print req.cancel_order("43960eab-d040-4eca-a4cd-bb20473e9960")
+    #print req.cancel_order(orderid)
 
 
