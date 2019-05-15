@@ -21,4 +21,16 @@ cp -r /usr/lib64/python2.7/site-packages/M2Crypto* pysdkenv/lib64/python2.7/site
   
 pip install -r requirements.txt  
   
-  
+
+
+
+#for Mac install M2Crypto 
+brew install openssl 
+brew install swig 
+env LDFLAGS="-L$(brew --prefix openssl)/lib" \ 
+CFLAGS="-I$(brew --prefix openssl)/include" \ 
+SWIG_FEAURES="-cpperraswarn -includeall \ 
+-I$(brew --prefix openssl)/include"  
+pip install m2crypto 
+
+
