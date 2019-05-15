@@ -23,14 +23,14 @@ pip install -r requirements.txt
   
 
 
-
-#for Mac install M2Crypto 
-brew install openssl 
-brew install swig 
-env LDFLAGS="-L$(brew --prefix openssl)/lib" \ 
-CFLAGS="-I$(brew --prefix openssl)/include" \ 
-SWIG_FEAURES="-cpperraswarn -includeall \ 
--I$(brew --prefix openssl)/include"  
-pip install m2crypto 
-
+  
+#for Mac install M2Crypto   
+brew install openssl   
+brew install swig   
+env LDFLAGS="-L$(brew --prefix openssl)/lib" \   
+CFLAGS="-I$(brew --prefix openssl)/include" \   
+SWIG_FEAURES="-cpperraswarn -includeall \   
+-I$(brew --prefix openssl)/include"    
+pip install m2crypto   
+  
 
