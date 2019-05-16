@@ -28,6 +28,7 @@ def wesocket_service():
     wsc = biger_websocket.WebsockClient(conf)
     wsc.run();
 
+
 def handle_request(client, address):
     try:
         result = "handle request error"
@@ -42,7 +43,7 @@ def handle_request(client, address):
         pass
     except socket.error as (code, msg):
         if code != errno.EINTR:
-            ERROR_LOG("handle request got errno(%s)", msg)
+            ERROR_LOG("handle request got errno(%s)" % msg)
     client.close()
 
 
@@ -51,7 +52,8 @@ def signal_term(signum, frame):
     WARNING_LOG("got singal term")
     graceful_shutdown = False
     if wsc.wsapp:
-        wsc.wsapp.close()
+        wsc.on_close(wsc.wsapp, True)
+
 
 def usage():
     print """
@@ -59,6 +61,7 @@ def usage():
     -c --conf             load config, e.g python ./bgcli.py -c cfg/bgcli.cfg
     -v --version          current version  
     """
+
 
 def parse_opt():
     try:
@@ -80,7 +83,7 @@ def parse_opt():
                 sys.exit()
 
 
-def main(ip = '', port = 8698, listen_num = 10):
+def main(ip='', port=8698, listen_num=10):
     global graceful_shutdown
     parse_opt()
     signal.signal(signal.SIGINT, signal_term)
@@ -94,10 +97,10 @@ def main(ip = '', port = 8698, listen_num = 10):
         sock.settimeout(5)
         sock.bind((ip, port))
         sock.listen(listen_num)
-        NOTICE_LOG("server started, listenning on %d", port)
+        NOTICE_LOG("server started, listenning on %d" % port)
     except socket.error as (code, msg):
         if code != errno.EINTR:
-            ERROR_LOG("cur pid[%d] set server failed! errno(%d), msg:%s", os.getpid(), code, msg)
+            ERROR_LOG("cur pid[%d] set server failed! errno(%d), msg:%s" % (os.getpid(), code, msg))
             graceful_shutdown = False
 
     while graceful_shutdown:
@@ -109,7 +112,7 @@ def main(ip = '', port = 8698, listen_num = 10):
             pass
         except socket.error as (code, msg):
             if code != errno.EINTR:
-                ERROR_LOG("listen socket errno(%d), msg:%s", code, msg)
+                ERROR_LOG("listen socket errno(%d), msg:%s" % (code, msg))
     sock.close()
     service_router_thread.join();
 

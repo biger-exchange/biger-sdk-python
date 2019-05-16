@@ -28,9 +28,14 @@ class Message:
         def heartbeat(self, ws):
                 self._query(ws, 'server.ping', '', time.time())
 
+        def ping(self, ws):
+                DEBUG_LOG("Sending Ping ...")
+                if ws.sock:
+                	ws.sock.ping()
+
         # 处理接受消息
         def service_route(self, ws, message, conf):
-                DEBUG_LOG("recieved message: " + message)
+                DEBUG_LOG("Recieved message: " + message)
                 if not conf:
                         return
                 req = request_client.RequestClient(conf.RESP_HTTP_API_URL, conf.ACCESS_TOCKEN, conf.PUBLIC_KEY, conf.PRIVATE_KEY)
