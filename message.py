@@ -31,7 +31,8 @@ class Message:
         def ping(self, ws):
                 DEBUG_LOG("Sending Ping ...")
                 if ws.sock:
-                	ws.sock.ping()
+                    if not ws.sock.ping():
+                        ws.sock.close()
 
         # 处理接受消息
         def service_route(self, ws, message, conf):
